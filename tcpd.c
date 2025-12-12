@@ -191,25 +191,38 @@ main( int argc, char **argv )
  {
 	num_eew = 1;
 	fp=fopen("num_eew_status","w");
-	fprintf(fp,"%d", num_eew);
-	fclose(fp);
-	printf("Does not exist ! Creating num_eew_ststus file .... \n");
+	if(fp != NULL) {
+		fprintf(fp,"%d", num_eew);
+		fclose(fp);
+	}
+	printf("Does not exist ! Creating num_eew_status file .... \n");
  }
  else
  {
-	fgets(tmp,99,fp);
-	if( strlen(tmp)>4 || atoi(tmp) < 1 || atoi(tmp) > 10000 )
-	{	
+	if(fgets(tmp,99,fp) == NULL) {
+		/* fgets failed, use default value */
 		num_eew = 1;
-		fp=fopen("num_eew_status","w");
-		fprintf(fp,"%d", num_eew);
-		fclose(fp);		
-		printf("Wrong File ! Creating num_eew_ststus file .... \n");		
-	}
-	else
-	{
-		num_eew = atoi(tmp);
 		fclose(fp);
+		printf("Error reading num_eew_status file, using default value.\n");
+	}
+	else {
+		int tmp_val = atoi(tmp);
+		fclose(fp);  /* Close the read-mode file first */
+		
+		if( strlen(tmp)>4 || tmp_val < 1 || tmp_val > 10000 )
+		{	
+			num_eew = 1;
+			fp=fopen("num_eew_status","w");
+			if(fp != NULL) {
+				fprintf(fp,"%d", num_eew);
+				fclose(fp);
+			}
+			printf("Wrong File ! Creating num_eew_status file .... \n");		
+		}
+		else
+		{
+			num_eew = tmp_val;
+		}
 	}
  }	
 	
